@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${branch.name} + ' - QuizApp Admin'">Branche - QuizApp Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+
+<!-- Navigation Admin -->
+<nav class="bg-white shadow-lg border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a th:href="@{/admin/dashboard}" class="flex items-center space-x-2">
+                    <i class="fas fa-graduation-cap text-2xl text-purple-600"></i>
+                    <span class="text-xl font-bold text-gray-800">QuizApp Admin</span>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a th:href="@{/admin/dashboard}" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-home mr-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <a th:href="@{/admin/branches}" class="text-gray-500 hover:text-gray-700">Branches</a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-700" th:text="${branch.name}">Branche</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <!-- En-tête de la branche -->
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                        <i class="fas fa-sitemap text-purple-600 mr-3"></i>
+                        <span th:text="${branch.name}">Nom de la branche</span>
+                    </h1>
+                    <p class="text-gray-600" th:text="${branch.description}">Description de la branche</p>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <a th:href="@{/admin/branches/{id}/edit(id=${branch.id})}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-edit mr-1"></i>Modifier
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clipboard-list text-white text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-blue-100 text-sm font-medium">Tests</p>
+                            <p class="text-white text-3xl font-bold" th:text="${branch.tests.size()}">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-tags text-white text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-green-100 text-sm font-medium">Catégories</p>
+                            <p class="text-white text-3xl font-bold" th:text="${totalCategories}">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-question-circle text-white text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-purple-100 text-sm font-medium">Questions</p>
+                            <p class="text-white text-3xl font-bold" th:text="${totalQuestions}">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des tests -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Tests de cette branche</h2>
+                    <a th:href="@{/admin/tests/new(branchId=${branch.id})}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-plus mr-2"></i>Nouveau test
+                    </a>
+                </div>
+
+                <div th:if="${branch.tests.empty}" class="text-center py-8">
+                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Aucun test dans cette branche.</p>
+                    <a th:href="@{/admin/tests/new(branchId=${branch.id})}" 
+                       class="inline-flex items-center px-4 py-2 mt-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
+                        <i class="fas fa-plus mr-2"></i>Créer le premier test
+                    </a>
+                </div>
+
+                <div th:unless="${branch.tests.empty}" class="grid gap-4">
+                    <div th:each="test : ${branch.tests}" 
+                         class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">
+                                    <a th:href="@{/admin/tests/{id}(id=${test.id})}" 
+                                       class="hover:text-purple-600" 
+                                       th:text="${test.name}">Nom du test</a>
+                                </h3>
+                                <div class="flex items-center text-sm text-gray-500 space-x-4">
+                                    <span>
+                                        <i class="fas fa-tags mr-1"></i>
+                                        <span th:text="${test.categories.size()}">0</span> catégorie(s)
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-question-circle mr-1"></i>
+                                        <span th:text="${test.totalQuestions}">0</span> question(s)
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <a th:href="@{/admin/tests/{id}(id=${test.id})}" 
+                                   class="text-purple-600 hover:text-purple-800">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/admin/tests/{id}/edit(id=${test.id})}" 
+                                   class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-between pt-6 border-t border-gray-200">
+                <a th:href="@{/admin/branches}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                    <i class="fas fa-arrow-left mr-2"></i>Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

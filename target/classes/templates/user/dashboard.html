@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - QuizApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-lg border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a th:href="@{/user/dashboard}" class="flex items-center space-x-2">
+                    <i class="fas fa-graduation-cap text-2xl text-purple-600"></i>
+                    <span class="text-xl font-bold text-gray-800">QuizApp</span>
+                </a>
+                
+                <div class="hidden md:ml-8 md:flex md:space-x-8">
+                    <a th:href="@{/user/dashboard}" class="text-purple-600 border-b-2 border-purple-600 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Tableau de bord
+                    </a>
+                    <a th:href="@{/quiz}" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-clipboard-list mr-2"></i>Quiz disponibles
+                    </a>
+                    <a th:href="@{/user/profile}" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-user mr-2"></i>Mon profil
+                    </a>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/dashboard}" class="text-orange-600 hover:text-orange-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-cogs mr-1"></i>Administration
+                    </a>
+                </div>
+                <span class="text-gray-700 text-sm">
+                    <i class="fas fa-user mr-1"></i><span sec:authentication="name"></span>
+                </span>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Header avec gradient -->
+<div class="gradient-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center text-white">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                Bienvenue, <span sec:authentication="name"></span> !
+            </h1>
+            <p class="text-xl text-gray-100">
+                Prêt à tester vos compétences techniques aujourd'hui ?
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-8">
+    
+    <!-- Statistiques personnelles -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Moyenne générale -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 card-hover">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Score moyen</p>
+                    <p class="text-2xl font-semibold text-gray-900">
+                        <span th:text="${#numbers.formatDecimal(userAverageScore, 1, 1)}">0.0</span>%
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total tentatives -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 card-hover">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i class="fas fa-clipboard-check text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Quiz terminés</p>
+                    <p class="text-2xl font-semibold text-gray-900" th:text="${totalAttempts}">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tests disponibles -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 card-hover">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <i class="fas fa-list-alt text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Tests disponibles</p>
+                    <p class="text-2xl font-semibold text-gray-900" th:text="${#lists.size(availableTests)}">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Tests disponibles -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">Tests disponibles</h3>
+                    <a th:href="@{/quiz}" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                        Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div th:if="${availableTests.empty}" class="text-center py-8">
+                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Aucun test disponible pour le moment</p>
+                </div>
+                
+                <div th:unless="${availableTests.empty}" class="space-y-4">
+                    <div th:each="test, iterStat : ${availableTests}" th:if="${iterStat.index < 5}" 
+                         class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold text-gray-900" th:text="${test.name}">Test name</h4>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <span th:text="${test.branch.name}">Branch</span> • 
+                                    <span th:text="${#lists.size(test.categories)} + ' catégories'">0 catégories</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <i class="fas fa-question-circle mr-1"></i>
+                                    <span th:text="${test.totalQuestions} + ' questions'">0 questions</span>
+                                </p>
+                            </div>
+                            <a th:href="@{/quiz/{id}(id=${test.id})}" 
+                               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition duration-200">
+                                <i class="fas fa-play mr-2"></i>Commencer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique récent -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">Historique récent</h3>
+                    <a th:href="@{/user/profile}" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                        Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div th:if="${recentAttempts.empty}" class="text-center py-8">
+                    <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 mb-4">Aucun quiz terminé</p>
+                    <a th:href="@{/quiz}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200">
+                        <i class="fas fa-rocket mr-2"></i>Commencer votre premier quiz
+                    </a>
+                </div>
+                
+                <div th:unless="${recentAttempts.empty}" class="space-y-3">
+                    <div th:each="attempt : ${recentAttempts}" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900" th:text="${attempt.test.name}">Test name</p>
+                            <p class="text-sm text-gray-600" th:text="${#temporals.format(attempt.attemptDate, 'dd/MM/yyyy HH:mm')}">Date</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-lg font-semibold" 
+                                      th:text="${#numbers.formatDecimal(attempt.score, 1, 1)} + '%'"
+                                      th:classappend="${attempt.score >= 70} ? 'text-green-600' : (${attempt.score >= 50} ? 'text-orange-600' : 'text-red-600')">
+                                    0%
+                                </span>
+                                <a th:href="@{/quiz/results/{id}(id=${attempt.id})}" 
+                                   class="text-purple-600 hover:text-purple-700 text-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mt-8">
+        <div class="bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl p-6 text-white">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-xl font-semibold mb-2">Prêt pour un nouveau défi ?</h3>
+                    <p class="text-purple-100">Choisissez un test et améliorez vos compétences techniques</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a th:href="@{/quiz}" 
+                       class="inline-flex items-center px-6 py-3 bg-white text-purple-600 font-medium rounded-lg hover:bg-gray-100 transition duration-200">
+                        <i class="fas fa-clipboard-list mr-2"></i>Parcourir les tests
+                    </a>
+                    <a th:href="@{/user/profile}" 
+                       class="inline-flex items-center px-6 py-3 border-2 border-white text-white font-medium rounded-lg hover:bg-white hover:text-purple-600 transition duration-200">
+                        <i class="fas fa-chart-bar mr-2"></i>Voir mes statistiques
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

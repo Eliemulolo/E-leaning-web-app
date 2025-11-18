@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - QuizApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+
+<div class="max-w-md w-full space-y-8 p-8">
+    <!-- Logo -->
+    <div class="text-center">
+        <a th:href="@{/}" class="inline-flex items-center space-x-2 text-2xl font-bold text-gray-800">
+            <i class="fas fa-graduation-cap text-3xl text-purple-600"></i>
+            <span>QuizApp</span>
+        </a>
+        <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+            Connexion à votre compte
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+            Pas encore de compte ?
+            <a th:href="@{/register}" class="font-medium text-purple-600 hover:text-purple-500">
+                Inscrivez-vous ici
+            </a>
+        </p>
+    </div>
+
+    <!-- Messages d'erreur -->
+    <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <span th:text="${error}"></span>
+    </div>
+
+    <div th:if="${message}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+        <span th:text="${message}"></span>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <form class="mt-8 space-y-6" th:action="@{/login}" method="post">
+        <div class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nom d'utilisateur
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                    <input id="username" name="username" type="text" required 
+                           class="appearance-none relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                           placeholder="Votre nom d'utilisateur">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                    Mot de passe
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input id="password" name="password" type="password" required 
+                           class="appearance-none relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+                           placeholder="Votre mot de passe">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <input id="remember-me" name="remember-me" type="checkbox" 
+                       class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                    Se souvenir de moi
+                </label>
+            </div>
+
+            <div class="text-sm">
+                <a href="#" class="font-medium text-purple-600 hover:text-purple-500">
+                    Mot de passe oublié ?
+                </a>
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" 
+                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200">
+                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                    <i class="fas fa-sign-in-alt text-white"></i>
+                </span>
+                Se connecter
+            </button>
+        </div>
+
+        <div class="text-center">
+            <span class="text-sm text-gray-600">ou</span>
+        </div>
+
+        <div>
+            <a th:href="@{/register}" 
+               class="group relative w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200">
+                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                    <i class="fas fa-user-plus text-gray-500"></i>
+                </span>
+                Créer un nouveau compte
+            </a>
+        </div>
+    </form>
+
+    <!-- Comptes de test -->
+    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+        <h3 class="text-sm font-medium text-blue-900 mb-2">Comptes de test :</h3>
+        <div class="text-xs text-blue-700 space-y-1">
+            <p><strong>Admin :</strong> admin / admin123</p>
+            <p><strong>Utilisateur :</strong> user / user123</p>
+        </div>
+    </div>
+
+    <!-- Retour accueil -->
+    <div class="text-center">
+        <a th:href="@{/}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Retour à l'accueil
+        </a>
+    </div>
+</div>
+
+<script>
+    // Focus sur le champ username au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('username').focus();
+    });
+</script>
+
+</body>
+</html>

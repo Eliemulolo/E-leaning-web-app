@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title + ' - QuizApp' : 'QuizApp - Application de Quiz Techniques'}">QuizApp</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Styles personnalisés -->
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navigation -->
+<nav class="bg-white shadow-lg border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <!-- Logo et Navigation principale -->
+            <div class="flex items-center">
+                <a th:href="@{/}" class="flex items-center space-x-2">
+                    <i class="fas fa-graduation-cap text-2xl text-primary-500"></i>
+                    <span class="text-xl font-bold text-gray-800">QuizApp</span>
+                </a>
+                
+                <!-- Navigation desktop -->
+                <div class="hidden md:ml-8 md:flex md:space-x-8">
+                    <a th:href="@{/}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Accueil</a>
+                    
+                    <div sec:authorize="hasRole('USER')" class="relative">
+                        <a th:href="@{/quiz}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                    </div>
+                    
+                    <div sec:authorize="hasRole('ADMIN')" class="relative">
+                        <a th:href="@{/admin/dashboard}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Administration</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Menu utilisateur -->
+            <div class="flex items-center space-x-4">
+                <div sec:authorize="isAuthenticated()" class="hidden md:flex md:items-center md:space-x-4">
+                    <span class="text-gray-700 text-sm">Bonjour, <span sec:authentication="name" class="font-medium"></span></span>
+                    <a th:href="@{/user/profile}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-user mr-1"></i>Profil
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
+                        </button>
+                    </form>
+                </div>
+                
+                <div sec:authorize="!isAuthenticated()" class="hidden md:flex md:items-center md:space-x-2">
+                    <a th:href="@{/login}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Connexion</a>
+                    <a th:href="@{/register}" class="btn-primary">Inscription</a>
+                </div>
+                
+                <!-- Menu mobile -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Menu mobile -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
+            <a th:href="@{/}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Accueil</a>
+            
+            <div sec:authorize="hasRole('USER')">
+                <a th:href="@{/quiz}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                <a th:href="@{/user/profile}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Profil</a>
+            </div>
+            
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/dashboard}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Administration</a>
+            </div>
+            
+            <div sec:authorize="isAuthenticated()" class="border-t border-gray-200 pt-2">
+                <span class="text-gray-500 block px-3 py-2 text-sm">Connecté en tant que <span sec:authentication="name" class="font-medium"></span></span>
+                <form th:action="@{/logout}" method="post" class="px-3">
+                    <button type="submit" class="text-red-600 hover:text-red-800 block py-2 text-base font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Déconnexion
+                    </button>
+                </form>
+            </div>
+            
+            <div sec:authorize="!isAuthenticated()" class="border-t border-gray-200 pt-2 space-y-1">
+                <a th:href="@{/login}" class="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Connexion</a>
+                <a th:href="@{/register}" class="text-primary-600 hover:text-primary-800 block px-3 py-2 rounded-md text-base font-medium">Inscription</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Messages Flash -->
+<div th:if="${success}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline" th:text="${success}"></span>
+        <button onclick="this.parentElement.style.display='none'" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<div th:if="${error}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline" th:text="${error}"></span>
+        <button onclick="this.parentElement.style.display='none'" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<div th:if="${message}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline" th:text="${message}"></span>
+        <button onclick="this.parentElement.style.display='none'" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Contenu principal -->
+<main layout:fragment="content">
+    <!-- Le contenu spécifique de chaque page sera inséré ici -->
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-graduation-cap text-2xl text-primary-500"></i>
+                    <span class="text-xl font-bold">QuizApp</span>
+                </div>
+                <p class="text-gray-400">Plateforme de quiz techniques pour tester et améliorer vos compétences.</p>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Navigation</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition duration-200">Accueil</a></li>
+                    <li><a href="#" class="hover:text-white transition duration-200">Quiz</a></li>
+                    <li><a href="#" class="hover:text-white transition duration-200">À propos</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li><i class="fas fa-envelope mr-2"></i>contact@quizapp.com</li>
+                    <li><i class="fas fa-phone mr-2"></i>+33 1 23 45 67 89</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 QuizApp. Tous droits réservés.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Menu mobile toggle
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu.classList.toggle('hidden');
+    });
+    
+    // Auto-hide flash messages
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('[role="alert"]');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease-out';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 500);
+        });
+    }, 5000);
+</script>
+
+</body>
+</html>
